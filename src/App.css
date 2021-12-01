@@ -12,8 +12,6 @@
   align-items: center;
 
   perspective: 240px;
-
-  background-color: #8b85a3;
   border-radius: .5rem;
   opacity: 25%;
   width: 15rem;
@@ -46,6 +44,6 @@
 
 @keyframes toss {
   0%    { transform: translateZ(0px); }
-  50%   { transform: translateZ(150px); }
+  50%   { transform: translateZ(100px); }
   100%  { transform: translateZ(0px); }
 }
