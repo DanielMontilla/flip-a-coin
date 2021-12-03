@@ -2,11 +2,11 @@ import React from 'react';
 import './App.css';
 import { rand, randPick } from './util';
 
-type color = 'red' | 'blue'
+type face = 'heads' | 'tails'
 
 interface props {};
 interface state {
-  color: color,
+  face: face,
   animations: Record<`flip` | 'toss', React.CSSProperties | undefined>,
   flipping: boolean
 }
@@ -14,7 +14,7 @@ interface state {
 export default class App extends React.Component<props, state> {
 
   public state: state = {
-    color: randPick(['red', 'blue']),
+    face: randPick(['heads', 'tails']),
     animations: {
       flip: undefined,
       toss: undefined
@@ -22,24 +22,27 @@ export default class App extends React.Component<props, state> {
     flipping: false
   }
 
-  public history: color[] = [];
+  public history: face[] = [];
 
   public render() {
-    let { color } = this.state;
+    let { face } = this.state;
     let { toss, flip } = this.state.animations;
 
     return <div className="App">
-      <div className="container" onClick={ () => { this.flip() }}>
+      <div className="container">
         <div style={ toss } onAnimationEnd={ () => { this.resetAnims() } }>
           <div style={ flip }>
-              <div className={`coin`} style={{ backgroundColor: color }}/>
+              <div className={`coin`} style={{ backgroundColor: `var(--${face})` }} onClick={ () => { this.flip() } }/>
           </div>
         </div>
       </div>
     </div>
   }
 
-  private flip() {
+  /**
+   * @description starts the flipping of the coin
+   */
+  private flip(): void {
     if (this.state.flipping) return;
     this.setState({ flipping: true });
 
@@ -52,28 +55,45 @@ export default class App extends React.Component<props, state> {
     this.waitAndChange(interval, count, true);
   }
 
-  private toggleColor () {
-    let { color } = this.state;
-    if (!color || color === 'red') {
-      this.setState({color: 'blue'});
+  /**
+   * @description responsable for looking at current state and determining next color. Basically just changes the coin from red to blue
+   */
+  private toggleFace (): void {
+    let { face: color } = this.state;
+    if (!color || color === 'heads') {
+      this.setState({face: 'tails'});
     } else {
-      this.setState({color: 'red'});
+      this.setState({face: 'heads'});
     }
   }
 
+  /**
+   * @description Handles the timings for color change of the coin
+   * @param amount time required for next change
+   * @param count remaining iterations of flip animation
+   * @param first indicates if this is the first iteration (should only be true initially)
+   */
   private waitAndChange(amount: number, count: number, first: boolean = false) {
     if (count === 0) { setTimeout( () => { this.setState({ flipping: false }) }, 100); return };
     count--;
     setTimeout( () => {
-      this.toggleColor();
+      this.toggleFace();
       this.waitAndChange(amount, count);
     }, (first) ? amount / 2 : amount )
   }
 
+  /**
+   * @description changes state so that related CSS animations styling is disabled on relevant objects
+   */
   private resetAnims() {
     this.setState({ animations: { flip: undefined, toss: undefined } });
   }
 
+  /**
+   * 
+   * @param change indicates whether the animation should end with the same color or change
+   * @returns { Object } that describes CSS styling for applying animation
+   */
   private generateAnims(change: boolean): { 
     flip: React.CSSProperties,
     toss: React.CSSProperties, 
