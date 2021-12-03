@@ -1,0 +1,1 @@
+type face = 'heads' | 'tails'

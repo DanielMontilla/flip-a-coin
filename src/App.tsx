@@ -1,8 +1,7 @@
 import React from 'react';
 import './App.css';
+import Coin from './coin';
 import { rand, randPick } from './util';
-
-type face = 'heads' | 'tails'
 
 interface props {};
 interface state {
@@ -22,7 +21,7 @@ export default class App extends React.Component<props, state> {
     flipping: false
   }
 
-  public history: face[] = [];
+  public history: JSX.Element[] = [];
 
   public render() {
     let { face } = this.state;
@@ -30,11 +29,16 @@ export default class App extends React.Component<props, state> {
 
     return <div className="App">
       <div className="container">
-        <div style={ toss } onAnimationEnd={ () => { this.resetAnims() } }>
-          <div style={ flip }>
-              <div className={`coin`} style={{ backgroundColor: `var(--${face})` }} onClick={ () => { this.flip() } }/>
+        <div className="coin-tainer1" style={ toss } onAnimationEnd={ () => { this.resetAnims() } }>
+          <div className="coin-tainer2" style={ flip }>
+              <Coin face={ face } border={ true } callback={ () => { this.flip() } }/>
           </div>
         </div>
+
+        <div className="history">
+          { this.history }
+        </div>
+
       </div>
     </div>
   }
@@ -74,7 +78,11 @@ export default class App extends React.Component<props, state> {
    * @param first indicates if this is the first iteration (should only be true initially)
    */
   private waitAndChange(amount: number, count: number, first: boolean = false) {
-    if (count === 0) { setTimeout( () => { this.setState({ flipping: false }) }, 100); return };
+    if (count === 0) {
+      setTimeout( () => { this.setState({ flipping: false }) }, 100);
+      this.history.push(<Coin face={ this.state.face }/>)
+      return
+    };
     count--;
     setTimeout( () => {
       this.toggleFace();
